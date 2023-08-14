@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import './MapComponent.css';
 
 // const { kakao } = window;
 
@@ -22,27 +23,30 @@ const MapComponent = ({ hospitals = [] }) => {
 
         const map = new window.kakao.maps.Map(container, options);
 
-        console.log(hospitals)
+        console.log(hospitals);
 
         // 병원 위치 마커로 표시
         hospitals.forEach(hospital => {
-            const position = new window.kakao.maps.LatLng(hospital.wgs_84_lat, hospital.wgs_84_lon)
+            const position = new window.kakao.maps.LatLng(hospital.wgs_84_lat, hospital.wgs_84_lon);
 
             const marker = new window.kakao.maps.Marker({position: position});
             marker.setMap(map);
 
-            const content = `<div class="custom-overlay" style="background-color: #ffffff; padding: 10px; border: 1px solid #ccc;">` +
+            // 마커 클릭 시 오버레이로 병원 정보 표시
+            const content = `<div class="custom-overlay">` +
             '    <div class="info">' + 
-            '        <div class="title">' + 
-            `            ${hospital.duty_name}` + 
-            // `            <div id="close" onclick=closeOverlay(overlay) title="닫기">X</div>` + 
-            '        </div>' + 
+            '       <div class="header">' + 
+            '           <div class="title">' + 
+            `               ${hospital.duty_name}` + 
+            `               ${hospital.center_type == 0 ? "(응급)" : "(외상)"}` +
+            '           </div>' + 
+            `            <button class="close" title="닫기">X</button>` + 
+            '        </div>' +
             '        <div class="body">' +
             '            <div class="desc">' + 
             `                <div class="address">${hospital.duty_addr}</div>` + 
             `                <div class="representitive-tel">대표: ${hospital.duty_tel1}</div>` + 
-            `                <div class="er-tel">응급실: ${hospital.duty_tel3}</div>` + 
-            `                <div class="center-type">${hospital.center_type}</div>` + 
+            `                <div class="er-tel">응급실: ${hospital.duty_tel3}</div>` +
             '            </div>' + 
             '        </div>' + 
             '    </div>' +
@@ -51,21 +55,24 @@ const MapComponent = ({ hospitals = [] }) => {
             const overlay = new window.kakao.maps.CustomOverlay({
                 position: position,
                 content: content
-            })
+            });
 
+            // 오버레이 닫기 기능 추가
             window.kakao.maps.event.addListener(marker, 'click', function(){
                 overlay.setMap(map);
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+
+                const closeBtn = tempDiv.querySelector('.close');
+                closeBtn.addEventListener('click', () => {
+                    overlay.setMap(null);
+                });
+
+                overlay.setContent(tempDiv);
             });
 
         });
-
-        // function closeOverlay(overlay){
-        //     overlay.setMap(null);
-        // };
-
-        // const closeOverlay = overlay => {
-        //     overlay.setMap(null);
-        // };
 
         // 지도 타입 컨트롤, 줌 컨트롤 추가
         const mapTypeControl = new window.kakao.maps.MapTypeControl();
