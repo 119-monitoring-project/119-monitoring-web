@@ -1,53 +1,58 @@
+#kakao-map {
+  width: 100%;
+  height: 100vh;
+} 
+
 .custom-overlay {
-    background-color: #ffffff;
-    padding: 10px;
-    border: 1px solid #ccc;
-  }
+  background-color: #ffffff;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
   
-  .custom-overlay .info {
-    display: flex;
-    flex-direction: column;
-  }
+.custom-overlay .info {
+  display: flex;
+  flex-direction: column;
+}
   
-  .custom-overlay .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #000000;
-  }
+.custom-overlay .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #000000;
+}
   
-  .custom-overlay .title {
-    font-weight: bold;
-  }
-  
-  .custom-overlay .close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    color: #999;
-    margin-left: 20px;
-  }
-  
-  .custom-overlay .close:hover {
-    color: #333;
-  }
-  
-  .custom-overlay .body {
-    font-size: 14px;
-    margin: 0px 10px 0px 10px;
-  }
-  
-  .custom-overlay .desc {
-    margin-top: 10px;
-  }
-  
-  .custom-overlay .address,
-  .custom-overlay .representitive-tel,
-  .custom-overlay .er-tel,
-  .custom-overlay .center-type {
-    margin-top: 5px;
-  }
+.custom-overlay .title {
+  font-weight: bold;
+}
+
+.custom-overlay .close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #999;
+  margin-left: 20px;
+}
+
+.custom-overlay .close:hover {
+  color: #333;
+}
+
+.custom-overlay .body {
+  font-size: 14px;
+  margin: 0px 10px 0px 10px;
+}
+
+.custom-overlay .desc {
+  margin-top: 10px;
+}
+
+.custom-overlay .address,
+.custom-overlay .representitive-tel,
+.custom-overlay .er-tel,
+.custom-overlay .center-type {
+  margin-top: 5px;
+}
   

@@ -1,12 +1,13 @@
-import './App.css';
-import HospitalList from './components/HospitalList';
+import React from 'react';
+import HospitalList  from './components/HospitalList';
+import Header from './components/Header';
 
 function App() {
   return (
-    <div className="App">
-      <h1>Kakao Map Integration</h1>
-      <HospitalList />
-    </div>
+      <div className="App">
+        <Header />
+        <HospitalList />
+      </div>
   );
 }
 

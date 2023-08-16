@@ -54,7 +54,8 @@ const MapComponent = ({ hospitals = [] }) => {
 
             const overlay = new window.kakao.maps.CustomOverlay({
                 position: position,
-                content: content
+                content: content,
+                yAnchor: 1.35
             });
 
             // 오버레이 닫기 기능 추가
@@ -83,7 +84,7 @@ const MapComponent = ({ hospitals = [] }) => {
     };
     }, [hospitals]);
 
-    return <div id="kakao-map" style={{ width: '100%', height: '400px' }} />;
+    return <div id="kakao-map" />;
 };
 
 export default MapComponent;
