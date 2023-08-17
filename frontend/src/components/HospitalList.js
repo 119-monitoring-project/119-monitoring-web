@@ -8,6 +8,7 @@ import './HospitalList.css';
 function HospitalList() {
     const [hospitals, setHospitals] = useState([]);
     const [selectedView, setSelectedView] = useState('map');
+    const [selectedHospital, setSelectedHospital] = useState({ latitude: 37.5665, longitude: 126.9780 });
     console.log("entered1")
 
     useEffect(() => {
@@ -21,8 +22,9 @@ function HospitalList() {
             });
     }, []);
 
-    const handleViewChange = (view) => {
+    const handleViewChange = (view, latitude, longitude) => {
         setSelectedView(view);
+        setSelectedHospital({ latitude, longitude })
     };
 
     return (
@@ -32,9 +34,9 @@ function HospitalList() {
 
             <div className="select-view-container">
                 {selectedView === 'map' ? (
-                    <MapComponent hospitals={hospitals} />
+                    <MapComponent hospitals={hospitals} selectedHospital={selectedHospital}/>
                 ) : (
-                    <HospitalListView hospitals={hospitals} />
+                    <HospitalListView hospitals={hospitals} onViewChange={handleViewChange}/>
                 )}
             </div>
         </div>
@@ -42,3 +44,4 @@ function HospitalList() {
 }
 
 export default HospitalList;
+

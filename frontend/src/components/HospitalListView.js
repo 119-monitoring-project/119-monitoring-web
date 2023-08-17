@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './HospitalListView.css';
-import MapComponent from './MapComponent';
 
-function HospitalListView({ hospitals }) {
+function HospitalListView({ hospitals, onViewChange }) {
     const itemsPerPage = 10;
     const maxVisiblePages = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -32,10 +31,6 @@ function HospitalListView({ hospitals }) {
         return Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
     };
 
-    const renderMapView = () => {
-        <MapComponent hospitals={hospitals} />
-    }
-
     return (
         <div>
             <div className='search-filter-container'>
@@ -46,13 +41,13 @@ function HospitalListView({ hospitals }) {
                 {currentHospitals.map(hospital => (
                     <div key={hospital.hpid} className='list-item'>
                         <div className='item-info'>
-                            <h3>{hospital.duty_name} {hospital.center_type === 0 ? "(응급)" : "(외상)"} </h3>
+                            <h3>{hospital.duty_name} {hospital.center_type == 0 ? "(응급)" : "(외상)"} </h3>
                             <p>{hospital.duty_addr}</p>
                             <p>대표: {hospital.duty_tel1}</p>
                             <p>응급실: {hospital.duty_tel3}</p>
                         </div>
                         <div className='item-link'>
-                            <button onClick={renderMapView(hospitals)}>지도에서 보기</button>
+                            <button onClick={() => onViewChange('map', hospital.wgs_84_lat, hospital.wgs_84_lon)}>지도에서 보기</button>
                         </div>
                     </div>
                 ))}
@@ -76,3 +71,4 @@ function HospitalListView({ hospitals }) {
 }
 
 export default HospitalListView;
+

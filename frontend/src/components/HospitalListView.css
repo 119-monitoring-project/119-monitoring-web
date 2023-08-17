@@ -1,4 +1,7 @@
 .list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
     padding: 5px;
     border: 1px solid #ddd;
@@ -6,12 +9,34 @@
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.list-item h3 {
-    margin: 0 0 10px 0;
+.item-info {
+    flex: 1;
+    margin-left: 10px;
 }
 
-.list-item p {
-    margin: 7px 0 7px 0;
+.item-info h3 {
+    margin: 0 0 15px 0;
+}
+
+.item-info p {
+    margin: 7px 0;
+}
+
+.item-link {
+    margin: 0 10px;
+}
+
+.item-link button {
+    background-color: #3595fd;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.item-link button:hover {
+    background-color: #0056b3;
 }
 
 .pagination {
