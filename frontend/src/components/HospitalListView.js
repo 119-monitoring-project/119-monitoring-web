@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './HospitalListView.css';
+import MapComponent from './MapComponent';
 
 function HospitalListView({ hospitals }) {
     const itemsPerPage = 10;
@@ -11,7 +12,6 @@ function HospitalListView({ hospitals }) {
     const currentHospitals = hospitals.slice(firstIndex, lastIndex);
 
     const totalPages = Math.ceil(hospitals.length / itemsPerPage);
-    const maxPage = Math.min(totalPages, maxVisiblePages);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -32,6 +32,10 @@ function HospitalListView({ hospitals }) {
         return Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
     };
 
+    const renderMapView = () => {
+        <MapComponent hospitals={hospitals} />
+    }
+
     return (
         <div>
             <div className='search-filter-container'>
@@ -41,31 +45,30 @@ function HospitalListView({ hospitals }) {
             <div className='list-container'>
                 {currentHospitals.map(hospital => (
                     <div key={hospital.hpid} className='list-item'>
-                        <h3>{hospital.duty_name} {hospital.center_type === 0 ? "(응급)" : "(외상)"} </h3>
-                        <p>{hospital.duty_addr}</p>
-                        <p>대표: {hospital.duty_tel1}</p>
-                        <p>응급실: {hospital.duty_tel3}</p>
+                        <div className='item-info'>
+                            <h3>{hospital.duty_name} {hospital.center_type === 0 ? "(응급)" : "(외상)"} </h3>
+                            <p>{hospital.duty_addr}</p>
+                            <p>대표: {hospital.duty_tel1}</p>
+                            <p>응급실: {hospital.duty_tel3}</p>
+                        </div>
+                        <div className='item-link'>
+                            <button onClick={renderMapView(hospitals)}>지도에서 보기</button>
+                        </div>
                     </div>
                 ))}
             </div>
 
             <div className='pagination'>
                 <button onClick={handleFirstPage}>First</button>
-                {Array.from({ length: maxPage }).map((_, index) => {
-                    const pageNumber = index + 1;
-                    const isFirstPage = pageNumber === 1;
-                    const isLastPage = pageNumber === totalPages;
-                    return (
-                        <button
-                            key={index}
-                            className={pageNumber === currentPage ? 'active' : ''}
-                            onClick={() => handlePageChange(pageNumber)}
-                            disabled={isFirstPage || isLastPage}
-                        >
-                            {pageNumber}
-                        </button>
-                    );
-                })}
+                {getPageRange().map((pageNumber, index) => (
+                    <button
+                        key={index}
+                        className={pageNumber === currentPage ? 'active' : ''}
+                        onClick={() => handlePageChange(pageNumber)}
+                    >
+                        {pageNumber}
+                    </button>
+                ))}
                 <button onClick={handleLastPage}>Last</button>
             </div>
         </div>
