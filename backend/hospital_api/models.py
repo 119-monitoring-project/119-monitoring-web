@@ -69,7 +69,7 @@ class HospitalDetail(models.Model):
     hpgryn = models.IntegerField()
     hpicuyn = models.IntegerField()
     hpnicuyn = models.IntegerField()
-    hppopyn = models.IntegerField()
+    hpopyn = models.IntegerField()
     
     class Meta:
         db_table = "HOSPITAL_DETAIL_INFO"
