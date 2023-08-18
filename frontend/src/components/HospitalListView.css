@@ -24,6 +24,8 @@
 
 .item-link {
     margin: 0 10px;
+    display: flex;
+    flex-direction: column;
 }
 
 .item-link button {
@@ -31,12 +33,47 @@
     color: #fff;
     border: none;
     padding: 5px 10px;
+    margin-bottom: 10px;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
 .item-link button:hover {
     background-color: #0056b3;
+}
+
+.detail-info {
+    margin-top: 30px;
+}
+
+.detail-info p {
+    margin-bottom: 20px;
+}
+
+.detail-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.detail-table th {
+    background-color: #f2f2f2;
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+.detail-table td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+.detail-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.detail-table tr {
+    margin-bottom: 5px;
 }
 
 .pagination {

@@ -7,6 +7,7 @@ import './HospitalList.css';
 
 function HospitalList() {
     const [hospitals, setHospitals] = useState([]);
+    const [hospitalDetails, setHospitalDetails] = useState([]);
     const [selectedView, setSelectedView] = useState('map');
     const [selectedHospital, setSelectedHospital] = useState({ latitude: 37.5665, longitude: 126.9780 });
     console.log("entered1")
@@ -19,6 +20,15 @@ function HospitalList() {
             })
             .catch(error => {
                 console.error('데이터를 가져오는 데 실패했습니다:', error);
+            });
+
+        // 백엔드 API에서 병원 상세 데이터 fetch
+        axios.get('http://localhost:8000/api/hospital_details/')
+            .then(response => {
+                setHospitalDetails(response.data);
+            })
+            .catch(error => {
+                console.error('병원 상세 데이터를 가져오는 데 실패했습니다:', error);
             });
     }, []);
 
@@ -36,7 +46,7 @@ function HospitalList() {
                 {selectedView === 'map' ? (
                     <MapComponent hospitals={hospitals} selectedHospital={selectedHospital}/>
                 ) : (
-                    <HospitalListView hospitals={hospitals} onViewChange={handleViewChange}/>
+                    <HospitalListView hospitals={hospitals} hospitalDetails={hospitalDetails} onViewChange={handleViewChange}/>
                 )}
             </div>
         </div>
