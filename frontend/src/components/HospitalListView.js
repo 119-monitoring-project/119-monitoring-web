@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './HospitalListView.css';
 
 function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
@@ -7,11 +7,36 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [expandedHospital, setExpandedHospital] = useState(null);
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCondition, setSelectedCondition] = useState('');
+    const [isFiltered, setIsFiltered] = useState(false);
+    
+    const filteredHospitals = hospitals.filter(hospital => {
+        const nameMatches = hospital.duty_name.includes(searchQuery);
+        const detail = hospitalDetails.find(detail => detail.hpid === hospital.hpid);
+        const conditionMatches = detail[selectedCondition] === 'Y' || detail[selectedCondition] > 0 || selectedCondition === '';
+
+        return nameMatches && conditionMatches;
+    });
+
+    // 검색, 필터링 조건이 적용된 경우 filteredHospitals를, 적용되지 않은 경우 hospitals를 사용
+    const activeList = isFiltered ? filteredHospitals : hospitals;
+    const totalPages = Math.ceil(activeList.length / itemsPerPage);
+
+    useEffect(() => {
+        setCurrentPage(1); // 필터 변경 시 1페이지로 이동
+    }, [isFiltered, selectedCondition, searchQuery]);
+
     const lastIndex = currentPage * itemsPerPage;
     const firstIndex = lastIndex - itemsPerPage;
-    const currentHospitals = hospitals.slice(firstIndex, lastIndex);
+    const currentHospitals = activeList.slice(firstIndex, lastIndex);
 
-    const totalPages = Math.ceil(hospitals.length / itemsPerPage);
+    // 사용자로부터 검색어, 필터링 조건 받아서 설정
+    const handleSearchFilter = (query, condition) => {
+        setSearchQuery(query);
+        setSelectedCondition(condition);
+        setIsFiltered(query || condition !== null);
+    };
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -32,6 +57,7 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
         return Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
     };
 
+    // 상세정보 창 토글
     const toggleExpansion = (hospital) => {
         if (expandedHospital === hospital) {
             setExpandedHospital(null);
@@ -43,20 +69,53 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
     return (
         <div>
             <div className='search-filter-container'>
-                
+                <input
+                    type='text'
+                    placeholder='병원 이름을 입력하세요.'
+                    value={searchQuery}
+                    onChange={(e) => handleSearchFilter(e.target.value, selectedCondition)}
+                />
+
+                <select
+                    value={selectedCondition}
+                    onChange={(e) => handleSearchFilter(searchQuery, e.target.value)}
+                >
+                    <option value=''>모두</option>
+                    <option value='duty_eryn'>응급실</option>
+                    <option value='hvoc'>수술실</option>
+                    <option value='hvcc'>신경중환자</option>
+                    <option value='hvncc'>신생중환자</option>
+                    <option value='hvccc'>흉부중환자</option>
+                    <option value='hvicc'>일반중환자</option>
+                    <option value='duty_hayn'>입원실</option>
+                    <option value='duty_hano'>병상수</option>
+                    <option value='mkioskty1'>뇌출혈수술</option>
+                    <option value='mkioskty2'>뇌경색의재관류</option>
+                    <option value='mkioskty3'>심근경색의재관류</option>
+                    <option value='mkioskty4'>복부손상의수술</option>
+                    <option value='mkioskty5'>사지접합의수술</option>
+                    <option value='mkioskty6'>응급내시경</option>
+                    <option value='mkioskty7'>응급투석</option>
+                    <option value='mkioskty8'>조산산모</option>
+                    <option value='mkioskty9'>정신질환자</option>
+                    <option value='mkioskty10'>신생아</option>
+                    <option value='mkioskty11'>중증화상</option>
+                    <option value='hpccuyn'>흉부중환자실</option>
+                    <option value='hpcuyn'>신경중환자실</option>
+                    <option value='hpicuyn'>일반중환자실</option>
+                    <option value='hpnicuyn'>신생아중환자실</option>
+                </select>
             </div>
 
             <div className='list-container'>
                 {currentHospitals.map(hospital => {
                     // 현재 병원의 상세 정보
                     const detailData = hospitalDetails.find(detail => detail.hpid === hospital.hpid);
-                    console.log(detailData);
-                    console.log(hospital.hpid);
 
                     return (
                     <div key={hospital.hpid} className={`list-item ${expandedHospital === hospital ? 'expanded' : ''}`}>
                         <div className='item-info'>
-                            <h3>{hospital.duty_name} {hospital.center_type == 0 ? "(응급)" : "(외상)"} </h3>
+                            <h3>{hospital.duty_name} {hospital.center_type === '0' ? '(응급)' : '(외상)'} </h3>
                             <p>{hospital.duty_addr}</p>
                             <p>대표: {hospital.duty_tel1}</p>
                             <p>응급실: {hospital.duty_tel3}</p>
@@ -146,7 +205,7 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
                                             
                                             <tr>
                                                 <td>입원실가용여부</td>
-                                                <td>{detailData.duty_hayn == 1 ? 'Y' : 'N'}</td>
+                                                <td>{detailData.duty_hayn === '1' ? 'Y' : 'N'}</td>
 
                                                 <td>응급투석</td>
                                                 <td>{detailData.mkioskty7}</td>
@@ -159,7 +218,7 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
                                                 <td>병상수</td>
                                                 <td>{detailData.duty_hano}</td>
 
-                                                <td>조선산모</td>
+                                                <td>조산산모</td>
                                                 <td>{detailData.mkioskty8}</td>
 
                                                 <td>신생아중환자실</td>
@@ -168,7 +227,7 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
 
                                             <tr>
                                                 <td>응급실운영여부</td>
-                                                <td>{detailData.duty_eryn == 1 ? 'Y' : 'N'}</td>
+                                                <td>{detailData.duty_eryn === '1' ? 'Y' : 'N'}</td>
 
                                                 <td>정신질환자</td>
                                                 <td>{detailData.mkioskty9}</td>

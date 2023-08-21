@@ -38,7 +38,7 @@ const MapComponent = ({ hospitals = [], selectedHospital }) => {
                 '       <div class="header">' + 
                 '           <div class="title">' + 
                 `               ${hospital.duty_name}` + 
-                `               ${hospital.center_type == 0 ? "(응급)" : "(외상)"}` +
+                `               ${hospital.center_type === "0" ? "(응급)" : "(외상)"}` +
                 '           </div>' + 
                 `            <button class="close" title="닫기">X</button>` + 
                 '        </div>' +
