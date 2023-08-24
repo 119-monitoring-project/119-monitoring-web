@@ -8,9 +8,13 @@ import './HospitalList.css';
 function HospitalList() {
     const [hospitals, setHospitals] = useState([]);
     const [hospitalDetails, setHospitalDetails] = useState([]);
+    const [hospitalRealTimes, setHospitalRealTimes] = useState([]);
+
     const [selectedView, setSelectedView] = useState('list');
     const [selectedHospital, setSelectedHospital] = useState({ latitude: 37.5665, longitude: 126.9780 });
-    const [isLoading, setIsLoading] = useState(true);
+
+    const [isDetailLoading, setIsDetailLoading] = useState(true);
+    const [isRealtimeLoading, setIsRealtimeLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -22,26 +26,34 @@ function HospitalList() {
             .catch(error => {
                 setError('병원 목록 데이터를 가져오는 데 실패했습니다.');
             });
-    }, []);
-
-    useEffect(() => {
+            
         // 백엔드 API에서 병원 상세 데이터 fetch
         axios.get('http://localhost:8000/api/hospital_details/')
             .then(response => {
                 setHospitalDetails(response.data);
-                setIsLoading(false);
+                setIsDetailLoading(false);
             })
             .catch(error => {
                 setError('병원 상세 데이터를 가져오는 데 실패했습니다.');
             });
-    }, [selectedView]);
+
+        // 백엔드 API에서 병원 실시간 데이터 fetch
+        axios.get('http://localhost:8000/api/hospital_realtime/')
+            .then(response => {
+                setHospitalRealTimes(response.data);
+                setIsRealtimeLoading(false);
+            })
+            .catch(error => {
+                setError('병원 실시간 데이터를 가져오는 데 실패했습니다.');
+            });
+    }, []);
 
     const handleViewChange = (view, latitude, longitude) => {
         setSelectedView(view);
         setSelectedHospital({ latitude, longitude })
     };
 
-    if (isLoading) {
+    if (isDetailLoading || isRealtimeLoading) {
         return <div>Loading...</div>;
     }
 
@@ -56,7 +68,7 @@ function HospitalList() {
 
             <div className="select-view-container">
                 {selectedView === 'list' ? (
-                    <HospitalListView hospitals={hospitals} hospitalDetails={hospitalDetails} onViewChange={handleViewChange}/>
+                    <HospitalListView hospitals={hospitals} hospitalDetails={hospitalDetails} hospitalRealTimes={hospitalRealTimes} onViewChange={handleViewChange}/>
                 ) : (
                     <MapComponent hospitals={hospitals} selectedHospital={selectedHospital}/>
                 )}
