@@ -1,19 +1,39 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './HospitalListView.css';
 
-function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
+function HospitalListView({ hospitals = [], hospitalDetails = [], onViewChange }) {
     const itemsPerPage = 10;
     const maxVisiblePages = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const [expandedHospital, setExpandedHospital] = useState(null);
+    const [expandedDetail, setExpandedDetail] = useState(null);
+    const [expandedRealTime, setExpandedRealTime] = useState(null);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCondition, setSelectedCondition] = useState('');
     const [isFiltered, setIsFiltered] = useState(false);
+
+    const [hospitalRealTimes, setHospitalRealTimes] = useState([]);
+
+    // 백엔드 API에서 병원 실시간 데이터 fetch
+    useEffect(() => {
+        axios.get('http://localhost:8000/api/hospital_realtime/')
+            .then(response => {
+                setHospitalRealTimes(response.data);
+            })
+            .catch(error => {
+                console.error('병원 실시간 데이터를 가져오는 데 실패했습니다:', error);
+            });
+    }, []);
     
+    // 검색, 필터링
     const filteredHospitals = hospitals.filter(hospital => {
         const nameMatches = hospital.duty_name.includes(searchQuery);
         const detail = hospitalDetails.find(detail => detail.hpid === hospital.hpid);
+
+        console.log("hospital: ", hospital);
+        console.log("hospitalDetails: ", hospitalDetails);
+
         const conditionMatches = detail[selectedCondition] === 'Y' || detail[selectedCondition] > 0 || selectedCondition === '';
 
         return nameMatches && conditionMatches;
@@ -23,8 +43,9 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
     const activeList = isFiltered ? filteredHospitals : hospitals;
     const totalPages = Math.ceil(activeList.length / itemsPerPage);
 
+     // 검색, 필터 조건 변경 시 1페이지로 이동
     useEffect(() => {
-        setCurrentPage(1); // 필터 변경 시 1페이지로 이동
+        setCurrentPage(1);
     }, [isFiltered, selectedCondition, searchQuery]);
 
     const lastIndex = currentPage * itemsPerPage;
@@ -57,13 +78,27 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
         return Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
     };
 
-    // 상세정보 창 토글
-    const toggleExpansion = (hospital) => {
-        if (expandedHospital === hospital) {
-            setExpandedHospital(null);
+    // 상세 정보 창 토글
+    const toggleDetailExpansion = (hospital) => {
+        if (expandedDetail === hospital || !activeList.includes(hospital)) {
+            setExpandedDetail(null);
         } else {
-            setExpandedHospital(hospital);
+            setExpandedDetail(hospital);
         }
+    };
+
+    // 실시간 병상 정보 창 토글
+    const toggleRealTimeExpansion = (hospital) => {
+        if (expandedRealTime === hospital || !activeList.includes(hospital)) {
+            setExpandedRealTime(null);
+        } else {
+            setExpandedRealTime(hospital);
+        }
+    };
+
+    // 실시간 데이터 동기화 버튼 클릭 시 페이지 새로고침해 axios 로직 재실행
+    const handleSyncRealTimeData = () => {
+        window.location.reload();
     };
 
     return (
@@ -105,26 +140,31 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
                     <option value='hpicuyn'>일반중환자실</option>
                     <option value='hpnicuyn'>신생아중환자실</option>
                 </select>
+
+                <button className='realtime-button' onClick={handleSyncRealTimeData}>실시간 정보 동기화</button>
             </div>
 
             <div className='list-container'>
                 {currentHospitals.map(hospital => {
-                    // 현재 병원의 상세 정보
+                    // 선택된 병원의 상세 정보
                     const detailData = hospitalDetails.find(detail => detail.hpid === hospital.hpid);
 
+                    // 선택된 병원의 실시간 병상 정보
+                    const realtimeData = hospitalRealTimes.find(realtime => realtime.hpid === hospital.hpid);
+
                     return (
-                    <div key={hospital.hpid} className={`list-item ${expandedHospital === hospital ? 'expanded' : ''}`}>
-                        <div className='item-info'>
+                    <div key={hospital.hpid} className={`list-item ${expandedDetail === hospital ? 'expanded' : ''}`}>
+                        <div className='basic-info'>
                             <h3>{hospital.duty_name} {hospital.center_type === '0' ? '(응급)' : '(외상)'} </h3>
                             <p>{hospital.duty_addr}</p>
                             <p>대표: {hospital.duty_tel1}</p>
                             <p>응급실: {hospital.duty_tel3}</p>
-                            {expandedHospital === hospital && (
-                                <div className='detail-info'>
+                            {expandedDetail === hospital && (
+                                <div className='info-title'>
                                     <h3>상세 정보</h3>
                                     <p>진료과목: {detailData.dgid_id_name}</p>
 
-                                    <table className='detail-table'>
+                                    <table className='info-table'>
                                         <tbody>
                                             <tr>
                                                 <td>응급실</td>
@@ -183,7 +223,7 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
 
                                             <tr>
                                                 <td>일반중환자</td>
-                                                <td>{detailData.hvicc}</td>
+                                                <td>{detailData.hvicc} / {detailData.hvs01}</td>
 
                                                 <td>사지접합의수술</td>
                                                 <td>{detailData.mkioskty5}</td>
@@ -222,7 +262,7 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
                                                 <td>{detailData.mkioskty8}</td>
 
                                                 <td>신생아중환자실</td>
-                                                <td>{detailData.hpnicuyn}</td>
+                                                <td>{detailData.hpnicuyn} / {realtimeData.hvs08}</td>
                                             </tr>
 
                                             <tr>
@@ -237,14 +277,262 @@ function HospitalListView({ hospitals, hospitalDetails, onViewChange }) {
                                             </tr>
                                         </tbody>
                                     </table>
-
                                 </div>
                             )}
+
+                            {expandedRealTime === hospital && (
+                                <div className='info-title'>
+                                    <h3>실시간 병상 정보</h3>
+
+                                    {realtimeData ? (
+                                        <table className='info-table'>
+                                            <tbody>
+                                                <tr>
+                                                    <td>응급실</td>
+                                                    <td>{realtimeData.hvec}</td>
+                                                    
+                                                    <td>수술실</td>
+                                                    <td>{realtimeData.hvoc} / {realtimeData.hvs22}</td>
+
+                                                    <td>신경중환자</td>
+                                                    <td>{realtimeData.hvcc} / {realtimeData.hvs11}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>신생중환자</td>
+                                                    <td>{realtimeData.hvncc}</td>
+                                                    
+                                                    <td>흉부중환자</td>
+                                                    <td>{realtimeData.hvccc} / {realtimeData.hvs16}</td>
+
+                                                    <td>일반중환자</td>
+                                                    <td>{realtimeData.hvicc} / {realtimeData.hvs17}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>신생중환자</td>
+                                                    <td>{realtimeData.hvgc}</td>
+                                                    
+                                                    <td>흉부중환자</td>
+                                                    <td>{realtimeData.hvccc}</td>
+
+                                                    <td>입원실</td>
+                                                    <td>{realtimeData.hvgc} / {realtimeData.hvs38}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>당직의</td>
+                                                    <td>{realtimeData.hvdnm}</td>
+                                                    
+                                                    <td>CT 가용여부</td>
+                                                    <td>{realtimeData.hvctayn} ({realtimeData.hvs27})</td>
+
+                                                    <td>MRI 가용여부</td>
+                                                    <td>{realtimeData.hvmriayn} ({realtimeData.hvs28})</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>혈관촬영기 가용여부</td>
+                                                    <td>{realtimeData.hvangioayn} ({realtimeData.hvs29})</td>
+                                                    
+                                                    <td>인공호흡기 가용여부</td>
+                                                    <td>{realtimeData.hvventiayn} ({realtimeData.hvs30})</td>
+
+                                                    <td>인공호흡기(조산아) 가용여부</td>
+                                                    <td>{realtimeData.hvventisoayn} ({realtimeData.hvs31})</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>인큐베이터 가용여부</td>
+                                                    <td>{realtimeData.hvincuayn} ({realtimeData.hvs32})</td>
+                                                    
+                                                    <td>CRRT 가용여부</td>
+                                                    <td>{realtimeData.hvcrrtayn} ({realtimeData.hvs33})</td>
+
+                                                    <td>ECMO 가용여부</td>
+                                                    <td>{realtimeData.hvecmoayn} ({realtimeData.hvs34})</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>고압산소치료기 가용여부</td>
+                                                    <td>{realtimeData.hvoxyayn} ({realtimeData.hvs37})</td>
+                                                    
+                                                    <td>중심체온조절유도기 가용여부</td>
+                                                    <td>{realtimeData.hvhypoayn} ({realtimeData.hvs35})</td>
+
+                                                    <td>구급차 가용여부</td>
+                                                    <td>{realtimeData.hvamyn}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>응급당직의 직통연락처</td>
+                                                    <td>{realtimeData.hv1}</td>
+                                                    
+                                                    <td>내과 중환자실</td>
+                                                    <td>{realtimeData.hv2} / {realtimeData.hvs06}</td>
+
+                                                    <td>외과 중환자실</td>
+                                                    <td>{realtimeData.hv3} / {realtimeData.hvs07}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>정형외과 입원실</td>
+                                                    <td>{realtimeData.hv4}</td>
+                                                    
+                                                    <td>신경과 입원실</td>
+                                                    <td>{realtimeData.hv5}</td>
+
+                                                    <td>신경외과 중환자실</td>
+                                                    <td>{realtimeData.hv6} / {realtimeData.hvs12}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>약물중환자</td>
+                                                    <td>{realtimeData.hv7}</td>
+                                                    
+                                                    <td>화상중환자</td>
+                                                    <td>{realtimeData.hv8} / {realtimeData.hvs13}</td>
+
+                                                    <td>외상중환자</td>
+                                                    <td>{realtimeData.hv9} / {realtimeData.hvs14}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>VENTI(소아)</td>
+                                                    <td>{realtimeData.hv10}</td>
+                                                    
+                                                    <td>인큐베이터</td>
+                                                    <td>{realtimeData.hv11}</td>
+
+                                                    <td>소아당직의 직통연락처</td>
+                                                    <td>{realtimeData.hv12}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>격리진료구역 음압격리병상 </td>
+                                                    <td>{realtimeData.hv13} / {realtimeData.hvs46}</td>
+                                                    
+                                                    <td>격리진료구역 일반격리병상</td>
+                                                    <td>{realtimeData.hv14} / {realtimeData.hvs47}</td>
+
+                                                    <td>소아음압격리</td>
+                                                    <td>{realtimeData.hv15} / {realtimeData.hvs48}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>소아일반격리</td>
+                                                    <td>{realtimeData.hv16} / {realtimeData.hvs49}</td>
+                                                    
+                                                    <td>[응급전용] 중환자실 음압격리</td>
+                                                    <td>{realtimeData.hv17} / {realtimeData.hvs50}</td>
+
+                                                    <td>[응급전용] 중환자실 일반격리</td>
+                                                    <td>{realtimeData.hv18} / {realtimeData.hvs51}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>[응급전용] 입원실 음압격리</td>
+                                                    <td>{realtimeData.hv19} / {realtimeData.hvs52}</td>
+                                                    
+                                                    <td>[응급전용] 입원실 일반격리</td>
+                                                    <td>{realtimeData.hv21} / {realtimeData.hvs53}</td>
+
+                                                    <td>감염병 전담병상 중환자실</td>
+                                                    <td>{realtimeData.hv22} / {realtimeData.hvs54}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>감염병 전담병상 중환자실 내 음압격리병상</td>
+                                                    <td>{realtimeData.hv23} / {realtimeData.hvs55}</td>
+                                                    
+                                                    <td>감염 중증 병상</td>
+                                                    <td>{realtimeData.hv24} / {realtimeData.hvs56}</td>
+
+                                                    <td>감염 준,중증 병상</td>
+                                                    <td>{realtimeData.hv25} / {realtimeData.hvs57}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>감염 중등증 병상</td>
+                                                    <td>{realtimeData.hv26} / {realtimeData.hvs58}</td>
+                                                    
+                                                    <td>코호트 격리</td>
+                                                    <td>{realtimeData.hv27} / {realtimeData.hvs59}</td>
+
+                                                    <td>소아</td>
+                                                    <td>{realtimeData.hv28} / {realtimeData.hvs02}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>응급실 음압 격리 병상</td>
+                                                    <td>{realtimeData.hv29} / {realtimeData.hvs03}</td>
+                                                    
+                                                    <td>응급실 일반 격리 병상</td>
+                                                    <td>{realtimeData.hv30} / {realtimeData.hvs04}</td>
+
+                                                    <td>[응급전용] 중환자실</td>
+                                                    <td>{realtimeData.hv31} / {realtimeData.hvs05}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>소아 중환자실</td>
+                                                    <td>{realtimeData.hv32} / {realtimeData.hvs09}</td>
+                                                    
+                                                    <td>[응급전용] 소아중환자실</td>
+                                                    <td>{realtimeData.hv33} / {realtimeData.hvs10}</td>
+
+                                                    <td>심장내과 중환자실</td>
+                                                    <td>{realtimeData.hv34} / {realtimeData.hvs15}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>음압격리 중환자실</td>
+                                                    <td>{realtimeData.hv35} / {realtimeData.hvs18}</td>
+                                                    
+                                                    <td>[응급전용] 입원실</td>
+                                                    <td>{realtimeData.hv36} / {realtimeData.hvs19}</td>
+
+                                                    <td>[응급전용] 소아입원실</td>
+                                                    <td>{realtimeData.hv37} / {realtimeData.hvs20}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>외상전용 입원실</td>
+                                                    <td>{realtimeData.hv38} / {realtimeData.hvs21}</td>
+                                                    
+                                                    <td>외상전용 수술실</td>
+                                                    <td>{realtimeData.hv39} / {realtimeData.hvs23}</td>
+
+                                                    <td>정신과 폐쇄병동 입원실</td>
+                                                    <td>{realtimeData.hv40} / {realtimeData.hvs24}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>음압격리 입원실</td>
+                                                    <td>{realtimeData.hv41} / {realtimeData.hvs25}</td>
+                                                    
+                                                    <td>분만실</td>
+                                                    <td>{realtimeData.hv42} / {realtimeData.hvs26}</td>
+
+                                                    <td>화상전용처치실</td>
+                                                    <td>{realtimeData.hv43} ({realtimeData.hvs36})</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    ) : (
+                                        <p>실시간 병상 정보를 제공하지 않는 병원입니다.</p>
+                                    )}
+                                </div>
+                            )}
+
                         </div>
                         <div className='item-link'>
                             <button onClick={() => onViewChange('map', hospital.wgs_84_lat, hospital.wgs_84_lon)}>지도에서 보기</button>
-                            <button className='detail-button' onClick={() => toggleExpansion(hospital)}>
-                                {expandedHospital === hospital ? '상세정보 닫기' : '상세정보 보기'}
+                            <button className='detail-button' onClick={() => toggleDetailExpansion(hospital)}>
+                                {expandedDetail === hospital ? '상세정보 닫기' : '상세정보 보기'}
+                            </button>
+                            <button className='realtime-button' onClick={() => toggleRealTimeExpansion(hospital)}>
+                                {expandedRealTime === hospital ? '실시간 정보 닫기' : '실시간 정보 보기'}
                             </button>
                         </div>
                     </div>

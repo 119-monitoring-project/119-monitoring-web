@@ -23,14 +23,14 @@ const MapComponent = ({ hospitals = [], selectedHospital }) => {
 
             const map = new window.kakao.maps.Map(container, options);
 
-            console.log(hospitals);
-
             // 병원 위치 마커로 표시
             hospitals.forEach(hospital => {
                 const position = new window.kakao.maps.LatLng(hospital.wgs_84_lat, hospital.wgs_84_lon);
 
                 const marker = new window.kakao.maps.Marker({position: position});
                 marker.setMap(map);
+
+                // const realtimeData = hospitalRealTimes.find(realtime => realtime.hpid === hospital.hpid);
 
                 // 마커 클릭 시 오버레이로 병원 정보 표시
                 const content = `<div class="custom-overlay">` +
@@ -47,6 +47,14 @@ const MapComponent = ({ hospitals = [], selectedHospital }) => {
                 `                <div class="address">${hospital.duty_addr}</div>` + 
                 `                <div class="representitive-tel">대표: ${hospital.duty_tel1}</div>` + 
                 `                <div class="er-tel">응급실: ${hospital.duty_tel3}</div>` +
+
+                                // (realtimeData ? (
+                                //     `<p>hvec: ${realtimeData.hvec}</p>` +
+                                //     `<p>hvoc: ${realtimeData.hvoc}</p>`
+                                // ) : (
+                                //     '<p>실시간 병상 정보를 제공하지 않는 병원입니다.</p>'
+                                // )) +
+
                 '            </div>' + 
                 '        </div>' + 
                 '    </div>' +
@@ -106,4 +114,5 @@ const MapComponent = ({ hospitals = [], selectedHospital }) => {
 };
 
 export default MapComponent;
+
 
