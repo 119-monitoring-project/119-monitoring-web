@@ -126,8 +126,8 @@ DATABASES = {
 }
 
 # Production 환경에서 수정
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = ['http://3.39.58.17:3000', 'http://52.79.71.4']
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['3.39.58.17', '52.79.71.4']

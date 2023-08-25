@@ -19,7 +19,7 @@ function HospitalList() {
 
     useEffect(() => {
         // 백엔드 API에서 병원 목록 데이터 fetch
-        axios.get('http://localhost:8000/api/hospitals/')
+        axios.get('http://52.79.71.4:8000/api/hospitals/')
             .then(response => {
                 setHospitals(response.data);
             })
@@ -28,7 +28,7 @@ function HospitalList() {
             });
             
         // 백엔드 API에서 병원 상세 데이터 fetch
-        axios.get('http://localhost:8000/api/hospital_details/')
+        axios.get('http://52.79.71.4:8000/api/hospital_details/')
             .then(response => {
                 setHospitalDetails(response.data);
                 setIsDetailLoading(false);
@@ -38,7 +38,7 @@ function HospitalList() {
             });
 
         // 백엔드 API에서 병원 실시간 데이터 fetch
-        axios.get('http://localhost:8000/api/hospital_realtime/')
+        axios.get('http://52.79.71.4:8000/api/hospital_realtime/')
             .then(response => {
                 setHospitalRealTimes(response.data);
                 setIsRealtimeLoading(false);

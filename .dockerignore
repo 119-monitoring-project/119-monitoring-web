@@ -1,0 +1,12 @@
+__pycache__
+
+.git
+.gitignore
+
+.venv
+*/poetry.lock
+*/package-lock.json
+*/node_modules
+
+.env
+*.md
