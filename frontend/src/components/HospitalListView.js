@@ -275,7 +275,7 @@ function HospitalListView({ hospitals = [], hospitalDetails = [], hospitalRealTi
 
                                             <tr>
                                                 <td>일반중환자</td>
-                                                <td>{detailData.hvicc} / {detailData.hvs01}</td>
+                                                <td>{detailData.hvicc}</td>
 
                                                 <td>사지접합의수술</td>
                                                 <td>{detailData.mkioskty5}</td>
@@ -314,7 +314,7 @@ function HospitalListView({ hospitals = [], hospitalDetails = [], hospitalRealTi
                                                 <td>{detailData.mkioskty8}</td>
 
                                                 <td>신생아중환자실</td>
-                                                <td>{detailData.hpnicuyn} / {realtimeData.hvs08}</td>
+                                                <td>{detailData.hpnicuyn}</td>
                                             </tr>
 
                                             <tr>
@@ -352,7 +352,7 @@ function HospitalListView({ hospitals = [], hospitalDetails = [], hospitalRealTi
 
                                                 <tr>
                                                     <td>신생중환자</td>
-                                                    <td>{realtimeData.hvncc}</td>
+                                                    <td>{realtimeData.hvncc} / {realtimeData.hvs08}</td>
                                                     
                                                     <td>흉부중환자</td>
                                                     <td>{realtimeData.hvccc} / {realtimeData.hvs16}</td>

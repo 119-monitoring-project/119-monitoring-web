@@ -47,14 +47,6 @@ const MapComponent = ({ hospitals = [], selectedHospital }) => {
                 `                <div class="address">${hospital.duty_addr}</div>` + 
                 `                <div class="representitive-tel">대표: ${hospital.duty_tel1}</div>` + 
                 `                <div class="er-tel">응급실: ${hospital.duty_tel3}</div>` +
-
-                                // (realtimeData ? (
-                                //     `<p>hvec: ${realtimeData.hvec}</p>` +
-                                //     `<p>hvoc: ${realtimeData.hvoc}</p>`
-                                // ) : (
-                                //     '<p>실시간 병상 정보를 제공하지 않는 병원입니다.</p>'
-                                // )) +
-
                 '            </div>' + 
                 '        </div>' + 
                 '    </div>' +
@@ -114,5 +106,3 @@ const MapComponent = ({ hospitals = [], selectedHospital }) => {
 };
 
 export default MapComponent;
-
-
