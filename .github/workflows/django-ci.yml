@@ -26,11 +26,14 @@ jobs:
     - name: Install Dependencies
       run: |
         cd backend && poetry install
+
+    - name: Build Docker image to DockerHub
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME_BACK }} -f Dockerfile.backend .
         
-    - name: Build, push Docker image to DockerHub
+    - name: Push Docker image to DockerHub
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME_BACK }} -f Dockerfile.backend .
         docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME_BACK }}
 
     - name: Executing remote ssh commands using key
