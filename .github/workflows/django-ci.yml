@@ -48,3 +48,4 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME_BACK }}
           docker run -d -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME_BACK }}
+          
