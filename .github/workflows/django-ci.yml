@@ -28,8 +28,12 @@ jobs:
         cd backend && poetry install
 
     - name: Build Docker image
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME_BACK }} .
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: Dockerfile.backend
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME_BACK }}
         
     - name: Push Docker image to DockerHub
       run: |
