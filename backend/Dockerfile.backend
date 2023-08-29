@@ -2,7 +2,7 @@ FROM python:3.11.4
 
 WORKDIR /app/backend
 
-COPY backend/pyproject.toml ./
+COPY pyproject.toml ./
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
