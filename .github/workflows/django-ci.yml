@@ -24,7 +24,7 @@ jobs:
         
     - name: Install Dependencies
       run: |
-        poetry install
+        cd backend && poetry install
 
     - name: Build Docker image
       run: |
