@@ -27,7 +27,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME_FRONT }} --file frontend/Dockerfile.frontend .
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME_FRONT }} --build-arg REACT_APP_KAKAO_MAP_API_KEY=${{ secrets.KAKAOMAP_API_KEY }} --file frontend/Dockerfile.frontend .
 
     - name: Push Docker image to DockerHub
       run: |
