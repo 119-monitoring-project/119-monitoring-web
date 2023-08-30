@@ -85,6 +85,14 @@ function HospitalListView({ hospitals = [], hospitalDetails = [], hospitalRealTi
         }
     };
 
+    // 검색, 필터링 조건 초기화
+    const handleResetFilters = () => {
+        setSearchQuery('');
+        setSelectedCondition('');
+        setSelectedRealtimeCondition('');
+    };
+
+
     // 실시간 정보 동기화 버튼 클릭 시 페이지 새로고침해 axios 로직 재실행
     const handleSyncRealTimeData = () => {
         window.location.reload();
@@ -194,10 +202,14 @@ function HospitalListView({ hospitals = [], hospitalDetails = [], hospitalRealTi
                     <option value='hv43'>화상전용처치실</option>
             </select>
 
+            <div className='button-container'>
+                <button className='reset-filters-button' onClick={handleResetFilters}>검색, 필터링 초기화</button>
+
                 <button className='realtime-sync-button' onClick={handleSyncRealTimeData}>
                     <img src={refreshIcon} alt="refreshIcon" />
                     <span>실시간 정보 동기화</span>
                 </button>
+            </div>
             </div>
 
             <div className='list-container'>

@@ -19,7 +19,13 @@
     box-sizing: border-box;
 }
 
-.realtime-sync-button {
+.button-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.search-filter-container button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -31,6 +37,12 @@
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-size: 15px;
+    width: 180px;
+    height: 45px;
+}
+
+.reset-filters-button:hover {
+    background-color: #0056b3;
 }
 
 .realtime-sync-button img {
