@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MapComponent from './MapComponent';
 import HospitalListView from './HospitalListView';
-import Header from './Header';
 import './HospitalList.css';
+import Header from './Header';
 import Loading from './Loading';
+import Index from './Index';
 
 function HospitalList() {
     const [hospitals, setHospitals] = useState([]);
@@ -17,6 +18,8 @@ function HospitalList() {
     const [isDetailLoading, setIsDetailLoading] = useState(true);
     const [isRealtimeLoading, setIsRealtimeLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [showIndex, setShowIndex] = useState(true);
 
     useEffect(() => {
         // 백엔드 API에서 병원 목록 데이터 fetch
@@ -50,6 +53,7 @@ function HospitalList() {
     }, []);
 
     const handleViewChange = (view, latitude, longitude) => {
+        setShowIndex(false);
         setSelectedView(view);
         setSelectedHospital({ latitude, longitude })
     };
@@ -67,13 +71,20 @@ function HospitalList() {
         <div className="content-container">
             <Header onViewChange={handleViewChange} />
 
-            <div className="select-view-container">
-                {selectedView === 'list' ? (
-                    <HospitalListView hospitals={hospitals} hospitalDetails={hospitalDetails} hospitalRealTimes={hospitalRealTimes} onViewChange={handleViewChange}/>
-                ) : (
-                    <MapComponent hospitals={hospitals} selectedHospital={selectedHospital}/>
-                )}
-            </div>
+            {/* 인덱스 컴포넌트 출력 */}
+            {showIndex ? (
+                <Index onClose={() => setShowIndex(false)} />
+            ) : (
+                <React.Fragment>
+                    <div className="select-view-container">
+                        {selectedView === 'list' ? (
+                            <HospitalListView hospitals={hospitals} hospitalDetails={hospitalDetails} hospitalRealTimes={hospitalRealTimes} onViewChange={handleViewChange}/>
+                        ) : (
+                            <MapComponent hospitals={hospitals} selectedHospital={selectedHospital}/>
+                        )}
+                    </div>
+                </React.Fragment>
+            )}
         </div>
     );
 }

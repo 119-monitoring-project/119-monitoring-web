@@ -1,0 +1,29 @@
+.index-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    background-image: url('../icons/indexBackground.jpg');
+    background-size: contain;
+    background-position: right;
+    background-repeat: no-repeat;
+    padding: 20px;
+    margin-left: 80px;
+}
+
+.index-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.start-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    width: 150px;
+    background-color: #4c4c4c;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
