@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './HospitalListView.css';
+import refreshIcon from '../icons/refreshIcon.png';
 
 function HospitalListView({ hospitals = [], hospitalDetails = [], hospitalRealTimes = [], onViewChange }) {
     const itemsPerPage = 10;
@@ -193,7 +194,10 @@ function HospitalListView({ hospitals = [], hospitalDetails = [], hospitalRealTi
                     <option value='hv43'>화상전용처치실</option>
             </select>
 
-                <button className='realtime-button' onClick={handleSyncRealTimeData}>실시간 정보 동기화</button>
+                <button className='realtime-sync-button' onClick={handleSyncRealTimeData}>
+                    <img src={refreshIcon} alt="refreshIcon" />
+                    <span>실시간 정보 동기화</span>
+                </button>
             </div>
 
             <div className='list-container'>
